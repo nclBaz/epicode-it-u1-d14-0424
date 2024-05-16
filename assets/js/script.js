@@ -12,7 +12,7 @@
 // --------------------- PARTE II, LA PARTE "DINAMICA" ------------------------------
 // Nella seconda parte andremo invece a definire quelli che saranno i comportamenti dell'applicazione. Pertanto dovremo andare a creare del codice che risponda a determinati eventi tipo click su una cella del calendario o creazione di un nuovo appuntamento
 
-// 4. Quando clicchiamo su una cella, essa dovrà essere in qualche maniera evidenziata; in più la sezione 'meeting day' dovrà riportare il numero del giorno selezionato
+// 4. Quando clicchiamo su una cella, essa dovrà essere in qualche maniera evidenziata; in più la sezione 'meeting day' dovrà riportare il numero del giorno selezionato ✅
 
 // 5. Alla pressione del tasto 'save meeting' dobbiamo leggere orario e nome dell'appuntamento e salvarli nell'elenco degli appuntamenti del giorno selezionato
 
@@ -54,7 +54,23 @@ const createDays = days => {
     // 2.4 Devo appendere l'h3 appena creato alla cella
     dayCell.appendChild(dayCellContent) // <div><h3>15</h3></div>
 
-    // 2.5 Aggiungo la cella così creata al calendario
+    // 2.5 Su OGNI Cella del calendario dobbiamo aggiungere un 'onclick', un evento che scateni una funzione quando la cella venga cliccata e che si occupi di aggiungere una classe 'selected' a tale cella
+    dayCell.onclick = event => {
+      // 2.5.1
+      // Dobbiamo non solo aggiungere la classe selected all'elemento cliccato ma anche rimuovere la classe dagli altri
+      const previouslySelected = document.querySelector(".selected") // torna l'unico nodo che sarà già selezionato
+      if (previouslySelected) previouslySelected.classList.remove("selected") // All'inizio non esiste nessun elemento con classe .selected, quindi è CRUCIALE fare if(previouslySelected) altrimenti starei provando ad utilizzare .classList su qualcosa che è NULL, ricevendo errori in console
+
+      // 2.5.2 Aggiungiamo quindi la classe selected all'elemento cliccato
+      event.currentTarget.classList.add("selected")
+
+      // 2.5.3 Andiamo a riportare il numero del giorno selezionato all'interno dello span 'newMeetingDay'
+      const daySpan = document.getElementById("newMeetingDay")
+      daySpan.innerText = i + 1
+      daySpan.classList.add("hasDay")
+    }
+
+    // 2.6 Aggiungo la cella così creata al calendario
     calendar.appendChild(dayCell)
     /* <div id="calendar">
           <div>
