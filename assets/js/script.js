@@ -128,28 +128,37 @@ const showMeetings = dayIndex => {
 const saveMeeting = event => {
   event.preventDefault() // senza di questo la pagina refresha ad ogni click <-- NO BUONO
 
-  // 1. Selezioniamo i dati inseriti all'interno degli input
-  const meetingTime = document.getElementById("newMeetingTime")
-  const meetingName = document.getElementById("newMeetingName")
+  // 0. Se non c'è nessun giorno selezionato non permetto di salvare un nuovo meeting
+  const selected = document.querySelector(".selected")
+  const button = document.querySelector("form button")
+  console.log(button)
 
-  // 2. Salvo i dati che compongono il nuovo appuntamento in una struttura dedicata
-  const meeting = meetingTime.value + " --- " + meetingName.value
-  console.log(meeting)
+  if (!selected) {
+    window.alert("Seleziona una cella")
+  } else {
+    // 1. Selezioniamo i dati inseriti all'interno degli input
+    const meetingTime = document.getElementById("newMeetingTime")
+    const meetingName = document.getElementById("newMeetingName")
 
-  // [["10.00 --- spesa", "12.00 --- dentista"], [], [], ["09.30 --- meeting lavoro"], [], [],...]
+    // 2. Salvo i dati che compongono il nuovo appuntamento in una struttura dedicata
+    const meeting = meetingTime.value + " --- " + meetingName.value
+    console.log(meeting)
 
-  const selectedDay = document.getElementById("newMeetingDay").innerText // "20"
-  const appointmentsIndex = selectedDay - 1
-  console.log("Index: ", appointmentsIndex)
-  const selectedDayAppointments = appointments[appointmentsIndex] // selectedDayAppointments è un array
-  selectedDayAppointments.push(meeting)
-  console.log(appointments)
+    // [["10.00 --- spesa", "12.00 --- dentista"], [], [], ["09.30 --- meeting lavoro"], [], [],...]
 
-  showMeetings(appointmentsIndex)
+    const selectedDay = document.getElementById("newMeetingDay").innerText // "20"
+    const appointmentsIndex = selectedDay - 1
+    console.log("Index: ", appointmentsIndex)
+    const selectedDayAppointments = appointments[appointmentsIndex] // selectedDayAppointments è un array
+    selectedDayAppointments.push(meeting)
+    console.log(appointments)
 
-  // 3. Ripulisco il form
-  meetingTime.value = ""
-  meetingName.value = ""
+    showMeetings(appointmentsIndex)
+
+    // 3. Ripulisco il form
+    meetingTime.value = ""
+    meetingName.value = ""
+  }
 }
 
 // CreateDays dovrebbe venir invocata al caricamento completato della pagina
