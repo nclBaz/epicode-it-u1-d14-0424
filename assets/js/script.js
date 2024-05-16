@@ -14,9 +14,10 @@
 
 // 4. Quando clicchiamo su una cella, essa dovrà essere in qualche maniera evidenziata; in più la sezione 'meeting day' dovrà riportare il numero del giorno selezionato ✅
 
-// 5. Alla pressione del tasto 'save meeting' dobbiamo leggere orario e nome dell'appuntamento e salvarli nell'elenco degli appuntamenti del giorno selezionato
+// 5. Alla pressione del tasto 'save meeting' dobbiamo leggere orario e nome dell'appuntamento e salvarli nell'elenco degli appuntamenti del giorno selezionato ✅
 
-// 6. Quando clicco su un giorno specifico dovrò poter vedere tutti gli appuntamenti per quella giornata
+// 6. Quando clicco su un giorno specifico dovrò poter vedere tutti gli appuntamenti per quella giornata ✅
+const appointments = []
 
 const daysInThisMonth = () => {
   const now = new Date() // Thu May 16 2024 09:36:34 GMT+0200 (Ora legale dell’Europa centrale)
@@ -36,6 +37,7 @@ const createDays = days => {
 
   // 2. Devo creare un certo numero di celle, 'certo numero' è un valore che viene passato come parametro
   for (let i = 0; i < days; i++) {
+    appointments.push([])
     // 2.1 Ad ogni iterazione dovrò creare un div, la cella
     const dayCell = document.createElement("div") // <div></div>
 
@@ -68,6 +70,14 @@ const createDays = days => {
       const daySpan = document.getElementById("newMeetingDay")
       daySpan.innerText = i + 1
       daySpan.classList.add("hasDay")
+
+      // 2.5.4 Mostro gli appuntamenti solo se ci sono per la giornata corrente
+      if (appointments[i].length > 0) showMeetings(i)
+      else {
+        // 2.5.5 Se non ci sono appuntamenti per la giornata, nascondi l'intera sezione
+        const meetingsDiv = document.getElementById("appointments")
+        meetingsDiv.style.display = "none"
+      }
     }
 
     // 2.6 Aggiungo la cella così creata al calendario
@@ -78,7 +88,7 @@ const createDays = days => {
           </div>
        </div>
     */
-  }
+  } // for
 }
 
 const printCurrentMonthInH1 = () => {
@@ -95,10 +105,61 @@ const printCurrentMonthInH1 = () => {
   title.innerText = currentMonth
 }
 
+const showMeetings = dayIndex => {
+  // 1. Andare a leggere dall'array appointments gli appuntamenti del giorno corrente (ottenuto tramite dayIndex)
+  const dayMeetings = appointments[dayIndex] // ci torna un array di meeting
+
+  // 2. Selezioniamo l'elemento <ul>
+  const meetingsUl = document.getElementById("appointmentsList")
+  // 2.1 Svuoto l'<ul> per poter aggiungere alla lista solo ed esclusivamente gli appuntamenti di oggi
+  meetingsUl.innerHTML = ""
+  // 3. Per ogni meeting trovato dobbiamo creare un <li> e appenderlo all' <ul>
+  dayMeetings.forEach(meeting => {
+    const newLi = document.createElement("li")
+    newLi.innerText = meeting
+    meetingsUl.appendChild(newLi) // aggiungiamo gli <li> all' <ul>
+  })
+
+  // 4. Andiamo a selezionare il div che conterrà gli appuntamenti e lo mostriamo (al momento è nascosto)
+  const meetingsDiv = document.getElementById("appointments")
+  meetingsDiv.style.display = "block"
+}
+
+const saveMeeting = event => {
+  event.preventDefault() // senza di questo la pagina refresha ad ogni click <-- NO BUONO
+
+  // 1. Selezioniamo i dati inseriti all'interno degli input
+  const meetingTime = document.getElementById("newMeetingTime")
+  const meetingName = document.getElementById("newMeetingName")
+
+  // 2. Salvo i dati che compongono il nuovo appuntamento in una struttura dedicata
+  const meeting = meetingTime.value + " --- " + meetingName.value
+  console.log(meeting)
+
+  // [["10.00 --- spesa", "12.00 --- dentista"], [], [], ["09.30 --- meeting lavoro"], [], [],...]
+
+  const selectedDay = document.getElementById("newMeetingDay").innerText // "20"
+  const appointmentsIndex = selectedDay - 1
+  console.log("Index: ", appointmentsIndex)
+  const selectedDayAppointments = appointments[appointmentsIndex] // selectedDayAppointments è un array
+  selectedDayAppointments.push(meeting)
+  console.log(appointments)
+
+  showMeetings(appointmentsIndex)
+
+  // 3. Ripulisco il form
+  meetingTime.value = ""
+  meetingName.value = ""
+}
+
 // CreateDays dovrebbe venir invocata al caricamento completato della pagina
 window.addEventListener("DOMContentLoaded", () => {
   // Tutto ciò che metto qua dentro verrà eseguito solo ed esclusivamente una volta che il DOM iniziale verrà caricato completamente
   const days = daysInThisMonth()
   createDays(days)
   printCurrentMonthInH1()
+
+  // Seleziono il form e ci aggancio all'evento 'submit' la funzione 'saveMeeting' che si occuperà di creare i nuovi meeting
+  const form = document.querySelector("form")
+  form.onsubmit = saveMeeting
 })
